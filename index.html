@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏥 Учет продаж врачей</title>
+    <style>
+        :root {
+            --color-bg-primary: #fcfcf9;
+            --color-bg-secondary: #fffffe;
+            --color-text-primary: #13343b;
+            --color-text-secondary: #626c7c;
+            --color-primary: #21808d;
+            --color-primary-hover: #1d7480;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-success: #21808d;
+            --color-error: #c0152f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--color-bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: var(--color-primary);
+        }
+
+        .user-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .salon-badge {
+            background: var(--color-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.12);
+            color: var(--color-text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.2);
+        }
+
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: var(--color-bg-secondary);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            color: var(--color-primary);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--color-bg-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .card {
+            background: var(--color-bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: var(--color-primary);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .doctor-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-bg-primary);
+            margin-top: 5px;
+        }
+
+        .doctor-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .doctor-item:hover {
+            background: rgba(33, 128, 141, 0.1);
+        }
+
+        .selected-doctor {
+            background: rgba(33, 128, 141, 0.15);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .product-btn {
+            padding: 15px;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-bg-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .product-btn:hover {
+            border-color: var(--color-primary);
+            background: rgba(33, 128, 141, 0.05);
+        }
+
+        .product-btn.selected {
+            border-color: var(--color-primary);
+            background: rgba(33, 128, 141, 0.15);
+            font-weight: 500;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(33, 128, 141, 0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error-message {
+            background: rgba(192, 21, 47, 0.1);
+            color: var(--color-error);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid var(--color-error);
+        }
+
+        .success-message {
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-success);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid var(--color-success);
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Экран входа -->
+        <div id="loginScreen" class="login-screen">
+            <div class="login-box">
+                <h2>🏥 Врачи и Продажи</h2>
+                <div class="form-group">
+                    <label>Магазин:</label>
+                    <select id="loginUsername" class="form-control">
+                        <option value="">-- Выберите магазин --</option>
+                        <option value="siema">Сиема</option>
+                        <option value="barakat">Баракат</option>
+                        <option value="citymall">Сити Молл</option>
+                        <option value="aini">Айни</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Пароль:</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Введите пароль">
+                </div>
+                <button onclick="login()" class="btn btn-primary" style="width: 100%;">Вход</button>
+                <div id="loginError" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <!-- Главный экран приложения -->
+        <div id="mainApp" class="hidden">
+            <div class="header">
+                <h1>🏥 Врачи и Продажи</h1>
+                <div class="user-info">
+                    <div class="salon-badge" id="currentSalon"></div>
+                    <button onclick="logout()" class="btn btn-secondary">Выход</button>
+                </div>
+            </div>
+
+            <!-- Регистрация продажи -->
+            <div class="card">
+                <h3>Регистрация продажи</h3>
+                <div class="form-group">
+                    <label>Поиск врача (код или фамилия):</label>
+                    <input type="text" id="searchDoctor" class="form-control" placeholder="Введите код или фамилию">
+                    <div id="doctorResults" class="doctor-list hidden"></div>
+                </div>
+                <div id="selectedDoctorInfo" class="selected-doctor hidden"></div>
+                <div class="form-group">
+                    <label>Выберите товар:</label>
+                    <div class="product-grid" id="productGrid"></div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="recordSale()" class="btn btn-primary">✓ Записать продажу</button>
+                    <button onclick="clearForm()" class="btn btn-secondary">✕ Очистить</button>
+                </div>
+                <div id="saleMessage" class="hidden"></div>
+            </div>
+
+            <!-- Продажи за сегодня -->
+            <div class="card">
+                <h3>Продажи за сегодня</h3>
+                <div class="table-container">
+                    <table id="todaySalesTable">
+                        <thead>
+                            <tr>
+                                <th>Врач</th>
+                                <th>Код</th>
+                                <th>Товар</th>
+                                <th>Время</th>
+                            </tr>
+                        </thead>
+                        <tbody id="todaySalesBody">
+                            <tr><td colspan="4" style="text-align: center;">Нет данных</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Добавить врача -->
+            <div class="card">
+                <h3>➕ Добавить нового врача</h3>
+                <div class="form-group">
+                    <label>Код врача:</label>
+                    <input type="text" id="newDoctorCode" class="form-control" placeholder="Например: 101">
+                </div>
+                <div class="form-group">
+                    <label>Фамилия врача:</label>
+                    <input type="text" id="newDoctorName" class="form-control" placeholder="Например: Иванов">
+                </div>
+                <button onclick="addDoctor()" class="btn btn-primary">Добавить врача</button>
+                <div id="doctorMessage" class="hidden"></div>
+            </div>
+
+            <!-- Список врачей -->
+            <div class="card">
+                <h3>Список врачей</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Код</th>
+                                <th>Фамилия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctorListBody">
+                            <tr><td colspan="2" style="text-align: center;">Загрузка...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://mvjiqysmcclvceswfqwv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12amlxeXNtY2NsdmNlc3dmcXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDUyOTYsImV4cCI6MjA3Njk4MTI5Nn0.FoRyIZ9E4M2ZwEE8Kh4hDdkBDLuhyqRut7VEKG4uQkk';
+
+        // Пользователи и их данные
+        const USERS = {
+            siema: { password: '1111', displayName: 'Сиема' },
+            barakat: { password: '1111', displayName: 'Баракат' },
+            citymall: { password: '1111', displayName: 'Сити Молл' },
+            aini: { password: '1111', displayName: 'Айни' }
+        };
+
+        const PRODUCTS = [
+            { id: 'shoes', name: '👟 Обувь' },
+            { id: 'insoles', name: '📍 Стельки' },
+            { id: 'accessories', name: '🎒 Аксессуары' },
+            { id: 'supinator', name: '🦶 Супинатор' },
+            { id: 'brace', name: '🏥 Брейс' },
+            { id: 'socks', name: '🧦 Чулки' },
+            { id: 'freika', name: '🔧 Шина фрейка' }
+        ];
+
+        let currentUser = null;
+        let doctors = [];
+        let selectedDoctor = null;
+        let selectedProduct = null;
+        let sales = [];
+
+        // Инициализация
+        function init() {
+            checkLogin();
+            renderProducts();
+            setupSearchListener();
+        }
+
+        // Проверка входа
+        function checkLogin() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                showMainApp();
+            }
+        }
+
+        // Вход
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!username) {
+                errorDiv.textContent = 'Выберите магазин';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (USERS[username] && USERS[username].password === password) {
+                currentUser = username;
+                localStorage.setItem('currentUser', username);
+                errorDiv.classList.add('hidden');
+                showMainApp();
+            } else {
+                errorDiv.textContent = 'Неверный пароль';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        // Выход
+        function logout() {
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginPassword').value = '';
+        }
+
+        // Показать главное приложение
+        function showMainApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('currentSalon').textContent = USERS[currentUser].displayName;
+            loadDoctors();
+            loadTodaySales();
+        }
+
+        // Отрисовка товаров
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            PRODUCTS.forEach(product => {
+                const btn = document.createElement('div');
+                btn.className = 'product-btn';
+                btn.textContent = product.name;
+                btn.onclick = () => selectProduct(product.id);
+                btn.dataset.productId = product.id;
+                grid.appendChild(btn);
+            });
+        }
+
+        // Выбор товара
+        function selectProduct(productId) {
+            selectedProduct = productId;
+            document.querySelectorAll('.product-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-product-id="${productId}"]`).classList.add('selected');
+        }
+
+        // Настройка поиска врача
+        function setupSearchListener() {
+            const searchInput = document.getElementById('searchDoctor');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (query.length === 0) {
+                    document.getElementById('doctorResults').classList.add('hidden');
+                    return;
+                }
+                
+                const filtered = doctors.filter(doc => 
+                    doc.code.toLowerCase().includes(query) || 
+                    doc.name.toLowerCase().includes(query)
+                );
+                
+                displayDoctorResults(filtered);
+            });
+        }
+
+        // Отображение результатов поиска врачей
+        function displayDoctorResults(filtered) {
+            const resultsDiv = document.getElementById('doctorResults');
+            if (filtered.length === 0) {
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            resultsDiv.innerHTML = '';
+            filtered.forEach(doc => {
+                const item = document.createElement('div');
+                item.className = 'doctor-item';
+                item.textContent = `${doc.code} - ${doc.name}`;
+                item.onclick = () => selectDoctor(doc);
+                resultsDiv.appendChild(item);
+            });
+            resultsDiv.classList.remove('hidden');
+        }
+
+        // Выбор врача
+        function selectDoctor(doctor) {
+            selectedDoctor = doctor;
+            document.getElementById('selectedDoctorInfo').textContent = 
+                `Выбранный врач: ${doctor.name} (код: ${doctor.code})`;
+            document.getElementById('selectedDoctorInfo').classList.remove('hidden');
+            document.getElementById('doctorResults').classList.add('hidden');
+            document.getElementById('searchDoctor').value = '';
+        }
+
+        // Запись продажи
+        async function recordSale() {
+            const messageDiv = document.getElementById('saleMessage');
+            
+            if (!selectedDoctor) {
+                messageDiv.className = 'error-message';
+                messageDiv.textContent = 'Выберите врача';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (!selectedProduct) {
+                messageDiv.className = 'error-message';
+                messageDiv.textContent = 'Выберите товар';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            const sale = {
+                salon: currentUser,
+                doctorCode: selectedDoctor.code,
+                doctorName: selectedDoctor.name,
+                product: PRODUCTS.find(p => p.id === selectedProduct).name,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                await saveSaleToSupabase(sale);
+                messageDiv.className = 'success-message';
+                messageDiv.textContent = '✓ Продажа успешно записана!';
+                messageDiv.classList.remove('hidden');
+                
+                clearForm();
+                loadTodaySales();
+                
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 3000);
+            } catch (error) {
+                messageDiv.className = 'error-message';
+                messageDiv.textContent = 'Ошибка при записи: ' + error.message;
+                messageDiv.classList.remove('hidden');
+            }
+        }
+
+        // Очистка формы
+        function clearForm() {
+            selectedDoctor = null;
+            selectedProduct = null;
+            document.getElementById('searchDoctor').value = '';
+            document.getElementById('selectedDoctorInfo').classList.add('hidden');
+            document.querySelectorAll('.product-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+
+        // Добавление врача
+        async function addDoctor() {
+            const code = document.getElementById('newDoctorCode').value.trim();
+            const name = document.getElementById('newDoctorName').value.trim();
+            const messageDiv = document.getElementById('doctorMessage');
+
+            if (!code || !name) {
+                messageDiv.className = 'error-message';
+                messageDiv.textContent = 'Заполните все поля';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (doctors.some(d => d.code === code)) {
+                messageDiv.className = 'error-message';
+                messageDiv.textContent = 'Врач с таким кодом уже существует';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            const newDoctor = { code, name };
+
+            try {
+                await saveDoctorToSupabase(newDoctor);
+                await loadDoctors();
+                messageDiv.className = 'success-message';
+                messageDiv.textContent = '✓ Врач успешно добавлен!';
+                messageDiv.classList.remove('hidden');
+                
+                document.getElementById('newDoctorCode').value = '';
+                document.getElementById('newDoctorName').value = '';
+                renderDoctorList();
+                
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 3000);
+            } catch (error) {
+                messageDiv.className = 'error-message';
+                messageDiv.textContent = 'Ошибка при добавлении: ' + error.message;
+                messageDiv.classList.remove('hidden');
+            }
+        }
+
+        // Загрузка врачей
+        async function loadDoctors() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/doctors?select=*`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                const data = await response.json();
+                doctors = data || [];
+                renderDoctorList();
+            } catch (error) {
+                console.error('Ошибка загрузки врачей:', error);
+                doctors = [];
+                renderDoctorList();
+            }
+        }
+
+        // Отрисовка списка врачей
+        function renderDoctorList() {
+            const tbody = document.getElementById('doctorListBody');
+            if (doctors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" style="text-align: center;">Нет врачей</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            doctors.forEach(doc => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${doc.code}</td><td>${doc.name}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Загрузка продаж за сегодня
+        async function loadTodaySales() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/sales?select=*,doctors(code,name)&sale_date=gte.${today}T00:00:00&sale_date=lte.${today}T23:59:59`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                const data = await response.json();
+                sales = data || [];
+                renderTodaySales();
+            } catch (error) {
+                console.error('Ошибка загрузки продаж:', error);
+                sales = [];
+                renderTodaySales();
+            }
+        }
+
+        // Отрисовка продаж за сегодня
+        function renderTodaySales() {
+            const tbody = document.getElementById('todaySalesBody');
+
+            if (sales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Нет данных</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            sales.reverse().forEach(sale => {
+                const tr = document.createElement('tr');
+                const time = new Date(sale.sale_date).toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                tr.innerHTML = `
+                    <td>${sale.doctors?.name || 'N/A'}</td>
+                    <td>${sale.doctors?.code || 'N/A'}</td>
+                    <td>${sale.product_type}</td>
+                    <td>${time}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Сохранение врача в Supabase
+        async function saveDoctorToSupabase(doctor) {
+            await fetch(`${SUPABASE_URL}/rest/v1/doctors`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    code: doctor.code,
+                    name: doctor.name
+                })
+            });
+        }
+
+        // Сохранение продажи в Supabase
+        async function saveSaleToSupabase(sale) {
+            const doctorId = doctors.find(d => d.code === sale.doctorCode)?.id;
+            
+            if (!doctorId) {
+                throw new Error('Врач не найден в базе данных');
+            }
+
+            await fetch(`${SUPABASE_URL}/rest/v1/sales`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    doctor_id: doctorId,
+                    product_type: sale.product
+                })
+            });
+        }
+
+        // Запуск при загрузке
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
+

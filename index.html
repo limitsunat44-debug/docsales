@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учет Продаж Врачей</title>
+    <style>
+        :root {
+            --color-bg-base: #0f172a;
+            --color-bg-elevated: #020617;
+            --color-bg-surface: #1e293b;
+            --color-bg-muted: #334155;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-text-muted: #94a3b8;
+            --color-text-accent: #38bdf8;
+            --color-primary: #38bdf8;
+            --color-primary-hover: #0ea5e9;
+            --color-primary-active: #0284c7;
+            --color-border: rgba(148, 163, 184, 0.2);
+            --color-error: #ef4444;
+            --color-success: #22c55e;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --color-bg-base: #ffffff;
+                --color-bg-elevated: #f8fafc;
+                --color-bg-surface: #f1f5f9;
+                --color-bg-muted: #e2e8f0;
+                --color-text-primary: #0f172a;
+                --color-text-secondary: #475569;
+                --color-text-muted: #64748b;
+                --color-text-accent: #0284c7;
+                --color-primary: #0284c7;
+                --color-primary-hover: #0369a1;
+                --color-primary-active: #075985;
+                --color-border: rgba(100, 116, 139, 0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg-base);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: var(--color-bg-surface);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-container h1 {
+            margin-bottom: 30px;
+            color: var(--color-text-accent);
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: var(--color-bg-base);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-primary);
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--color-primary);
+            color: var(--color-bg-base);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--color-primary-hover);
+        }
+
+        button:active {
+            background: var(--color-primary-active);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-muted);
+            color: var(--color-text-primary);
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-surface);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--color-bg-surface);
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            color: var(--color-text-accent);
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-badge {
+            padding: 8px 16px;
+            background: var(--color-bg-muted);
+            border-radius: 20px;
+            color: var(--color-text-primary);
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            width: auto;
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .sale-form {
+            background: var(--color-bg-surface);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .sale-form h2 {
+            margin-bottom: 20px;
+            color: var(--color-text-accent);
+            font-size: 20px;
+        }
+
+        .product-list {
+            margin-top: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--color-bg-base);
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+
+        .product-item select {
+            flex: 2;
+        }
+
+        .product-item input {
+            flex: 1;
+        }
+
+        .product-item button {
+            width: auto;
+            padding: 8px 16px;
+            background: var(--color-error);
+            flex: 0;
+        }
+
+        .add-product-btn {
+            width: auto;
+            padding: 10px 20px;
+            margin-top: 10px;
+            background: var(--color-bg-muted);
+            color: var(--color-text-primary);
+        }
+
+        .sales-table {
+            background: var(--color-bg-surface);
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .sales-table h2 {
+            margin-bottom: 20px;
+            color: var(--color-text-accent);
+            font-size: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: var(--color-bg-muted);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+        }
+
+        tr:hover {
+            background: var(--color-bg-base);
+        }
+
+        .admin-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--color-bg-surface);
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            padding: 15px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--color-error);
+            border-radius: 8px;
+            color: var(--color-error);
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            padding: 15px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--color-success);
+            border-radius: 8px;
+            color: var(--color-success);
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--color-bg-surface);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: var(--color-text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: var(--color-text-accent);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .product-item {
+                flex-direction: column;
+            }
+
+            .admin-filters {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen" class="login-container">
+        <h1>Вход в систему</h1>
+        <div class="form-group">
+            <label for="username">Пользователь</label>
+            <select id="username">
+                <option value="">Выберите пользователя</option>
+                <option value="siema">Сиема</option>
+                <option value="barakat">Баракат</option>
+                <option value="aini">Айни</option>
+                <option value="citymall">Сити Молл</option>
+                <option value="admin">Администратор</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" placeholder="Введите пароль">
+        </div>
+        <button onclick="login()">Войти</button>
+        <div id="loginError" class="error-message hidden">Неверные данные для входа</div>
+    </div>
+
+    <div id="userScreen" class="container hidden">
+        <div class="header">
+            <h1>Учет продаж</h1>
+            <div class="user-info">
+                <span class="user-badge" id="userBadge"></span>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+
+        <div class="sale-form">
+            <h2>Новая продажа</h2>
+            <div class="form-group">
+                <label for="doctorSearch">Поиск врача (по фамилии или коду карты)</label>
+                <input type="text" id="doctorSearch" placeholder="Введите фамилию или код карты">
+            </div>
+            <div class="form-group">
+                <label for="doctorSelect">Выберите врача</label>
+                <select id="doctorSelect">
+                    <option value="">Выберите врача</option>
+                </select>
+            </div>
+
+            <div class="product-list" id="productList">
+                <div class="product-item">
+                    <select class="product-select">
+                        <option value="">Выберите товар</option>
+                        <option value="Обувь">Обувь</option>
+                        <option value="Стельки">Стельки</option>
+                        <option value="Шина Фрейка">Шина Фрейка</option>
+                        <option value="Брейс Вальгус">Брейс Вальгус</option>
+                        <option value="Подпятник">Подпятник</option>
+                        <option value="Бандаж">Бандаж</option>
+                        <option value="Супинатор">Супинатор</option>
+                        <option value="Массажер">Массажер</option>
+                        <option value="Коврик">Коврик</option>
+                    </select>
+                    <input type="number" class="product-quantity" placeholder="Количество" min="1" value="1">
+                    <input type="number" class="product-price" placeholder="Цена" min="0" step="0.01">
+                </div>
+            </div>
+
+            <button class="add-product-btn" onclick="addProductRow()">+ Добавить товар</button>
+            <button onclick="submitSale()" style="margin-top: 20px;">Сохранить продажу</button>
+            <div id="saleMessage" class="success-message hidden"></div>
+        </div>
+
+        <div class="sales-table">
+            <h2>Сегодняшние продажи</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Всего продаж</h3>
+                    <p id="todaySalesCount">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Общая сумма</h3>
+                    <p id="todaySalesTotal">0</p>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Время</th>
+                        <th>Врач</th>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody id="todaySalesTable">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--color-text-muted);">Продаж пока нет</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="adminScreen" class="container hidden">
+        <div class="header">
+            <h1>Панель администратора</h1>
+            <div class="user-info">
+                <span class="user-badge">Администратор</span>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+
+        <div class="admin-filters">
+            <div class="filter-group">
+                <label for="filterStore">Магазин</label>
+                <select id="filterStore">
+                    <option value="">Все магазины</option>
+                    <option value="siema">Сиема</option>
+                    <option value="barakat">Баракат</option>
+                    <option value="aini">Айни</option>
+                    <option value="citymall">Сити Молл</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterDoctor">Врач</label>
+                <select id="filterDoctor">
+                    <option value="">Все врачи</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterProduct">Товар</label>
+                <select id="filterProduct">
+                    <option value="">Все товары</option>
+                    <option value="Обувь">Обувь</option>
+                    <option value="Стельки">Стельки</option>
+                    <option value="Шина Фрейка">Шина Фрейка</option>
+                    <option value="Брейс Вальгус">Брейс Вальгус</option>
+                    <option value="Подпятник">Подпятник</option>
+                    <option value="Бандаж">Бандаж</option>
+                    <option value="Супинатор">Супинатор</option>
+                    <option value="Массажер">Массажер</option>
+                    <option value="Коврик">Коврик</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterDateFrom">Дата от</label>
+                <input type="date" id="filterDateFrom">
+            </div>
+            <div class="filter-group">
+                <label for="filterDateTo">Дата до</label>
+                <input type="date" id="filterDateTo">
+            </div>
+            <div class="filter-group" style="display: flex; align-items: flex-end;">
+                <button onclick="applyFilters()">Применить фильтры</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Всего продаж</h3>
+                <p id="adminSalesCount">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Общая сумма</h3>
+                <p id="adminSalesTotal">0</p>
+            </div>
+        </div>
+
+        <div class="sale-form" style="margin-bottom: 30px;">
+            <h2>Добавить нового врача</h2>
+            <div style="display: flex; gap: 15px; align-items: flex-end;">
+                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                    <label for="newDoctorName">ФИО врача</label>
+                    <input type="text" id="newDoctorName" placeholder="Введите ФИО врача">
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="newDoctorCode">Код карты</label>
+                    <input type="text" id="newDoctorCode" placeholder="Код">
+                </div>
+                <button onclick="addNewDoctor()" style="width: auto; padding: 12px 24px;">Добавить врача</button>
+            </div>
+            <div id="addDoctorMessage" class="success-message hidden"></div>
+        </div>
+
+        <div class="sales-table">
+            <h2>Отчет по продажам</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Магазин</th>
+                        <th>Врач</th>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody id="adminSalesTable">
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--color-text-muted);">Загрузка данных...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://mvjiqysmcclvceswfqwv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12amlxeXNtY2NsdmNlc3dmcXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDUyOTYsImV4cCI6MjA3Njk4MTI5Nn0.FoRyIZ9E4M2ZwEE8Kh4hDdkBDLuhyqRut7VEKG4uQkk';
+
+        let doctors = [
+            {name: 'Джамиля Дилмуродовна', code: '716'}, {name: 'Назриддинова Нигора', code: '715'}, {name: 'Игамова Малика', code: '714'},
+            {name: 'Каримова Назира', code: '713'}, {name: 'Рахмонов Бахтиер', code: '712'}, {name: 'Абдуллоев Алишер', code: '711'},
+            {name: 'Додомирзоева Гульчечак', code: '710'}, {name: 'Елезавета Олеговна', code: '709'}, {name: 'Мусоева Насиба', code: '708'},
+            {name: 'Яхшиева Алдуз', code: '707'}, {name: 'Мамадшоева Рахима', code: '706'}, {name: 'Жигулина Марина', code: '705'},
+            {name: 'Кариева Мадина', code: '704'}, {name: 'Зухро Курган', code: '703'}, {name: 'Саидов Джахонгир', code: '702'},
+            {name: 'Айниев Борон', code: '701'}, {name: 'Аминов Мухаммад', code: '700'}, {name: 'Гафуров Шохон', code: '699'},
+            {name: 'Шарипов Анус', code: '698'}, {name: 'Сафаров Маруф', code: '697'}, {name: 'Джураева Нафиса', code: '696'},
+            {name: 'Рахимзода Фируз', code: '695'}, {name: 'Эхсанов Сафармат', code: '694'}, {name: 'Тоджибоев Абдурассул', code: '693'},
+            {name: 'Нуриддинов Мансур', code: '692'}, {name: 'Зайнуддинов Бегичон', code: '691'}, {name: 'Буйраев Султонмурод', code: '690'},
+            {name: 'Алиев Навруз', code: '689'}, {name: 'Ибрагимова Мехрона повФЦ2', code: '688'}, {name: 'Тагоев Амрулло', code: '685'},
+            {name: 'Садиров Ворис', code: '684'}, {name: 'Даврон Мусоев', code: '683'}, {name: 'Охунова Хабиба', code: '681'},
+            {name: 'Гаюров Курган-Тюбе', code: '680'}, {name: 'Курбонов Екубчон', code: '678'}, {name: 'Озода массаж аэропорт', code: '677'},
+            {name: 'Каримов 4 кор кораб', code: '676'}, {name: 'Абдуллаев Исматулло', code: '675'}, {name: 'Халилова Рано', code: '674'},
+            {name: 'Ризвонов Асрор кораб', code: '672'}, {name: 'Шарифзода Шараф', code: '671'}, {name: 'Давлатов Хабибулло', code: '670'},
+            {name: 'Насиба Махмадова', code: '669'}, {name: 'Sattorov Истиклол', code: '668'}, {name: 'Тагоев Дилшод', code: '667'},
+            {name: 'Нуралиева 11 кор кораб', code: '666'}, {name: 'Ходжаев Хоким', code: '662'}, {name: 'Холова Садбарг', code: '660'},
+            {name: 'Нурахмадов Фаррух', code: '659'}, {name: 'Хабибулаева Фарзона', code: '658'}, {name: 'Ходжаев Фирдавс', code: '656'},
+            {name: 'Сироджзода Кутбиддин', code: '655'}, {name: 'Ниезов Мададй Акбар ортопед', code: '654'}, {name: 'Раджабова Шоира', code: '592'},
+            {name: 'Сафияи Амирхон', code: '590'}, {name: 'Хамзаев Хазрат', code: '589'}, {name: 'Иброхимов Иброхим', code: '588'},
+            {name: 'Мамаджанова Гулнора', code: '587'}, {name: 'Иззатзода Нурулло', code: '586'}, {name: 'Мирзохонов Умархон', code: '585'},
+            {name: 'Беков Абдуганй', code: '584'}, {name: 'Тошева Дилярфуз', code: '583'}, {name: 'Рано Хабибулаевна Роддом', code: '582'},
+            {name: 'Джалолов Зулфич', code: '580'}, {name: 'Янусов Муродбек', code: '578'}, {name: 'Холмуминов Даврон', code: '577'},
+            {name: 'Абдуллаев М. 2к.', code: '576'}, {name: 'Джаборов Мануче хр', code: '575'}, {name: 'Бобохонов Субхон', code: '574'},
+            {name: 'Шукруллоев Андалеб', code: '573'}, {name: 'Набиев Мухабатулло', code: '572'}, {name: 'Хасанова Хуршеда', code: '571'},
+            {name: 'Интернет', code: '569'}, {name: 'Тоиров Исмоил', code: '568'}, {name: 'Джалилов Шерзод', code: '567'},
+            {name: 'Мираков Бехруз', code: '565'}, {name: 'Шахбоз ортопед 13поликл.', code: '564'}, {name: 'Рахимов Абубакр', code: '563'},
+            {name: 'Асроров Мухаммадсаттор', code: '562'}, {name: 'Салимзода Ортопед 4.к.', code: '561'}, {name: 'Фарид Курбонов', code: '559'},
+            {name: 'Лола Джумаева', code: '558'}, {name: 'Амонова Саломат', code: '557'}, {name: 'Ниязова Мухає', code: '556'},
+            {name: 'Холов Анвар', code: '555'}, {name: 'Мирзобеков Курбонали', code: '554'}, {name: 'Дустов Хусейн', code: '552'},
+            {name: 'Каюмов Муроджон', code: '551'}, {name: 'Зайнудиннов Давлатмурод', code: '550'}, {name: 'Разоков Джанобиддин', code: '549'},
+            {name: 'Ганиев Хусейн', code: '548'}, {name: 'Саидмуродов Хилоли', code: '547'}, {name: 'Боймуродов Бобомурод', code: '546'},
+            {name: 'Камолов Мухаммад', code: '545'}, {name: 'Раджабова Дилярфуз', code: '544'}, {name: 'Хайдаров Шамсиддин', code: '543'},
+            {name: 'Рейс Татьяна', code: '542'}, {name: 'Тошпулотов Хуршед', code: '541'}, {name: 'Рикардо Мюллер', code: '540'},
+            {name: 'Рахимова Сайрам', code: '539'}, {name: 'Гульчехра Фатхуллоева', code: '537'}, {name: 'Курбонова Лутфия', code: '536'},
+            {name: 'Шамиев Бахтиер', code: '535'}, {name: 'Джамиля Назарова', code: '534'}, {name: 'Доршанбиев Пулод', code: '533'},
+            {name: 'Сафаров Диловар', code: '532'}, {name: 'Басирова Фируза', code: '531'}, {name: 'Ахмедова Диловара', code: '530'},
+            {name: 'Норбеков Шухрат', code: '529'}, {name: 'Асоев Усмон', code: '528'}, {name: 'Кулмамадова Алфия', code: '527'},
+            {name: 'Мукаррама Асланова', code: '526'}, {name: 'Мукаддас Файзулаевна', code: '525'}, {name: 'Розия Пулатовна', code: '524'},
+            {name: 'Ахмедова Гульназ', code: '523'}, {name: 'Ортикова Мунира', code: '522'}, {name: 'Мирзобекова Гулнора', code: '521'},
+            {name: 'Ерматов Файзали', code: '520'}, {name: 'Демченко Людмила', code: '519'}, {name: 'Косимова Махмудахон', code: '518'},
+            {name: 'Эхсонов Абдушукур', code: '517'}, {name: 'Самиев Бахтиер', code: '516'}, {name: 'Рано 11корп.', code: '515'},
+            {name: 'Аптека 1', code: '514'}, {name: 'Кадамов Саидмумин', code: '513'}, {name: 'Кахоров Зухириддин', code: '512'},
+            {name: 'Янусов Исломиддин', code: '511'}, {name: 'Курбонова Райфа', code: '510'}, {name: 'Сохиба Мирзоевна', code: '509'},
+            {name: 'Пиров Рискулло', code: '508'}, {name: 'Сабуров Муродали', code: '507'}, {name: 'Тоджибоев Ином', code: '506'},
+            {name: 'Толибов Шоди', code: '505'}, {name: 'Бегматов Хакназар', code: '504'}, {name: 'Шерматов Бахтиер', code: '503'},
+            {name: 'Сагизов Насим', code: '502'}, {name: 'Курбанов Саидбилол', code: '501'}, {name: 'Шарипов Мирзо', code: '500'},
+            {name: 'Акрамов Садриддин', code: '767'}, {name: 'Шарипова Фарзона Караболо', code: '766'}, {name: 'Файзрахимов Хабибулло', code: '765'},
+            {name: 'Ермамадова Кобулмо', code: '764'}, {name: 'Зогова Зиеда', code: '763'}, {name: 'Файзиева Холида', code: '762'},
+            {name: 'Боев Бахтиер', code: '761'}, {name: 'Шарифова Адиба', code: '760'}, {name: 'Садуллоев Рустам', code: '759'},
+            {name: 'Абдурахманов Саидумар', code: '758'}, {name: 'Файзуллоев Файзулло', code: '757'}, {name: 'Махмадиев Зулфикор', code: '756'},
+            {name: 'Сокиев Ислом', code: '755'}, {name: 'Курбонов Муртазо', code: '754'}, {name: 'Холматова Гульджахон', code: '753'},
+            {name: 'Фируза Пулатовна', code: '752'}, {name: 'Умаров Сайфулло', code: '751'}, {name: 'Довудов Алимурод', code: '749'},
+            {name: 'Хабибуллоева Мехрангез', code: '748'}, {name: 'Муродов Сорбон', code: '747'}, {name: 'Абдуллоев Аюбшо', code: '746'},
+            {name: 'Камолов Икромиддин', code: '745'}, {name: 'Сафарзода Хуршед', code: '744'}, {name: 'Маматова Гулола', code: '743'},
+            {name: 'Хайруллоева Дилбар', code: '742'}, {name: 'Бобоев Голиб', code: '741'}, {name: 'Аскаров Алишер', code: '740'},
+            {name: 'Давлатов Талабшо Хисор', code: '739'}, {name: 'Умеда Стопа Спина', code: '738'}, {name: 'Саидов Мирали', code: '737'},
+            {name: 'Иброхимова Дилафруз', code: '736'}, {name: 'Мусоев Бобошо', code: '735'}, {name: 'Абдулхамидов Алишер', code: '734'},
+            {name: 'Аскарова Фируза', code: '733'}, {name: 'Самадова Умеда', code: '732'}, {name: 'Алишер Массажист Диамед', code: '731'},
+            {name: 'Давлатова Ноэля', code: '730'}, {name: 'Хотамов Маъруф Пахтобод', code: '729'}, {name: 'Идиев 1 советский', code: '728'},
+            {name: 'Олимова Поликлиника 14', code: '727'}, {name: 'Назаров Рустам', code: '726'}, {name: 'Ерова Зебо Мехргон', code: '725'},
+            {name: 'Мирхасанова Гульнисо Ленинский', code: '724'}, {name: 'Назаров Хотура Пахтобод', code: '723'}, {name: 'Файзуллаева Поликлника 8', code: '722'},
+            {name: 'Абдуллаева Нодира', code: '721'}, {name: 'Орипов Мухаммад', code: '720'}, {name: 'Хасаншоева Диагностика', code: '719'},
+            {name: 'Махфират Хошимовна', code: '718'}, {name: 'Мухитдинов Хуросон', code: '717'}, {name: 'Султонмамадова Насрин', code: '773'},
+            {name: 'Турдибоев Шерали Абдуллоевич', code: '772'}, {name: 'Рохила массажист Курган', code: '771'}, {name: 'Каримов Абдукодир', code: '770'},
+            {name: 'Давлатов Скубчон', code: '769'}, {name: 'Гиесов Абубакр', code: '768'}, {name: 'Барно Хамиджононовна', code: '242'},
+            {name: 'Кобилов Набичон', code: '241'}, {name: 'Кодиров Додулло', code: '240'}, {name: 'Наимов Бунед', code: '239'},
+            {name: 'Ашуров Исмоил', code: '238'}, {name: 'Примов Бехруз', code: '237'}, {name: 'Хасанзода Хабибшо', code: '236'},
+            {name: 'Ходжаев Рахматулло', code: '235'}, {name: 'Узоков Ином', code: '234'}, {name: 'Шеров Махмадсаид', code: '233'},
+            {name: 'Азизов Давлатходжа', code: '232'}, {name: 'Абдуллоева Замира', code: '231'}, {name: 'Салимова Шахзода', code: '230'},
+            {name: 'Шоев Шахбоз', code: '229'}, {name: 'Давлатова Шамсия', code: '228'}, {name: 'Дориев Абдусаттор', code: '227'},
+            {name: 'Мирасанова Гулнисо', code: '226'}, {name: 'Матлубов Тохир', code: '225'}, {name: 'Имамова Бунафша', code: '224'},
+            {name: 'Кузиева Дулпаной', code: '223'}, {name: 'Турсуновна Шарофат', code: '222'}, {name: 'Сафарзода Имрон', code: '221'},
+            {name: 'Сафаров Одил', code: '220'}, {name: 'Мавлуда Шерматовна', code: '219'}, {name: 'Махамадали Кадырович', code: '218'},
+            {name: 'Халимов Манучехр', code: '217'}, {name: 'Курбонов Дилахон', code: '216'}, {name: 'Назирбаева Оксана', code: '215'},
+            {name: 'Хусейнзода Назрулло', code: '214'}, {name: 'Хусайнов Анвар', code: '213'}, {name: 'Назаров Холтура', code: '212'},
+            {name: 'Дориев Ахтам', code: '211'}, {name: 'Гульшоев Кудратулло', code: '210'}, {name: 'Мамадиев Зульфикор', code: '209'},
+            {name: 'Насруллоев Нурулло', code: '208'}, {name: 'Абдурахмонов Шахбоз', code: '207'}, {name: 'Риеев Исмоил', code: '206'},
+            {name: 'Иброхимов Фариддун', code: '205'}, {name: 'Sattorov Шамсиддин', code: '204'}, {name: 'Курбонализода Ином', code: '203'},
+            {name: 'Хайдаров Аминджон', code: '202'}, {name: 'Разоков Абдували', code: '201'}, {name: 'Ятимов Парвиз', code: '200'},
+            {name: 'Ярматов Лутфулло', code: '199'}, {name: 'Хушватов Саиджон', code: '198'}, {name: 'Султонов Шахобиддин', code: '197'},
+            {name: 'Sattorov Абдуджалил', code: '196'}, {name: 'Назарова Сурайо Д/с Аниса', code: '195'}, {name: 'Маршарапова Барно', code: '194'},
+            {name: 'Марина Рашидовна', code: '193'}, {name: 'Абдуллоев Мухтоджон', code: '192'}, {name: 'Дориев Шухрат', code: '190'},
+            {name: 'Дилярфуз массаж на дому', code: '189'}, {name: 'Джабарова Нигора массаж', code: '187'}, {name: 'Фаризай Шералиэод массаж', code: '186'},
+            {name: 'Барно Массаж на дому', code: '185'}, {name: 'Донаева Нигина', code: '184'}, {name: 'Камилова Нигора', code: '183'},
+            {name: 'Олимова Клавдия', code: '182'}, {name: 'Зоиров Сирохиддин', code: '181'}, {name: 'Гоибназаров Анвар', code: '180'},
+            {name: 'Хазанбаевич Сидик', code: '179'}, {name: 'Наташа Массаж', code: '178'}, {name: 'Хайдарова Умеда', code: '177'},
+            {name: 'Турсунова Хадиса', code: '176'}, {name: 'Мавдуда Рахимова', code: '175'}, {name: 'Исокова Зульфида', code: '174'},
+            {name: 'Сафарова Шахло', code: '173'}, {name: 'Завицкая Татьяна', code: '172'}, {name: 'Усмонов Хайрулло', code: '171'},
+            {name: 'Тришина Анна', code: '170'}, {name: 'Шарапова Азиза', code: '168'}, {name: 'Косимова Манижа', code: '167'},
+            {name: 'Шохиди Дилбар', code: '165'}, {name: 'Мухаммадали Хотамиен', code: '164'}, {name: 'Нилюфари Хакназар', code: '163'},
+            {name: 'Мамадбекова Кодиламох', code: '162'}, {name: 'Косимова Фируза', code: '161'}, {name: 'Холова Зебо', code: '160'},
+            {name: 'Раджабов Парвиз', code: '158'}, {name: 'Шеров Муборз', code: '157'}, {name: 'Асозода Мунис', code: '156'},
+            {name: 'Расулов Лочин', code: '155'}, {name: 'Исупов Шамсуддин', code: '154'}, {name: 'Ниезов Мухаммадзодин', code: '153'},
+            {name: 'Рахимназарова Дарина', code: '152'}, {name: 'Ситора Нуралиева', code: '151'}, {name: 'Джойлонов Диловар', code: '150'},
+            {name: 'Мастибекова Гулджахон', code: '149'}, {name: 'Махмадалиев Гуломхайлар', code: '148'}, {name: 'Умаров Баходур', code: '147'},
+            {name: 'Соназаров Абдуманонон', code: '146'}, {name: 'Хадамова Бахтигул', code: '145'}, {name: 'Ахмедов Азиз', code: '144'},
+            {name: 'Рафиев Ахмад', code: '143'}, {name: 'Салимов Мухиддин', code: '142'}, {name: 'Пирназаров Нурали', code: '141'},
+            {name: 'Мадаминова Истода', code: '140'}, {name: 'Янгибаева Барно', code: '139'}, {name: 'Джураев Хуршед', code: '138'},
+            {name: 'Зарина Тагоева', code: '137'}, {name: 'Умедов Ахлиддин', code: '136'}, {name: 'Тешаев Фируз', code: '135'},
+            {name: 'Хасанов Бехруз', code: '134'}, {name: 'Солимзода Муким', code: '133'}, {name: 'Кадиров Саидшариф', code: '132'},
+            {name: 'Абдуллоев Асуф', code: '131'}, {name: 'Холилова Зульфия', code: '130'}, {name: 'Низомова Мавджуда', code: '129'},
+            {name: 'Исаева Холида', code: '128'}, {name: 'Хайдарова Фотима', code: '127'}, {name: 'Зокиров Аминджон', code: '126'},
+            {name: 'Зарина Алимова', code: '125'}, {name: 'Солиев Шухрат', code: '124'}, {name: 'Гулноза Сайфова', code: '123'},
+            {name: 'Ганиев Боймурод', code: '122'}, {name: 'Ашуров Бахтиер', code: '121'}, {name: 'Ахмедов Сахиджон', code: '120'},
+            {name: 'Сафарова Анахита', code: '119'}, {name: 'Ярбобоев Сайфулло', code: '118'}, {name: 'Наджмиддинов Неъматджон', code: '117'},
+            {name: 'Алиджон Джураевич', code: '116'}, {name: 'Хакназар Хакназарович', code: '115'}, {name: 'Шарипова Фарзона', code: '113'},
+            {name: 'Нуриддинзода Насима', code: '112'}, {name: 'Нурхонов Дилшод', code: '111'}, {name: 'Диловар Хокироев', code: '110'},
+            {name: 'Азамов Акбар', code: '109'}, {name: 'Абдулхаева Шамсия', code: '108'}, {name: 'Бобоев Мухаммадрахим', code: '107'},
+            {name: 'Абдуллоев Мурод', code: '106'}, {name: 'Абдуллаева Шабнам', code: '105'}, {name: 'Рахмонова Бунафша', code: '104'},
+            {name: 'Толибов Диловар', code: '103'}, {name: 'Рахматов Холмаджон', code: '102'}, {name: 'Назаров Исомуддин', code: '100'}
+        ];
+
+        let currentUser = null;
+        let currentStore = null;
+
+        function initDoctorSelects() {
+            renderDoctorLists();
+        }
+
+        function renderDoctorLists() {
+            const userSelect = document.getElementById('doctorSelect');
+            const adminSelect = document.getElementById('filterDoctor');
+            
+            userSelect.innerHTML = '<option value="">Выберите врача</option>';
+            adminSelect.innerHTML = '<option value="">Все врачи</option>';
+            
+            const sortedDoctors = [...doctors].sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+            
+            sortedDoctors.forEach(doctor => {
+                const option1 = document.createElement('option');
+                option1.value = doctor.name;
+                option1.textContent = `${doctor.name} (${doctor.code})`;
+                userSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = doctor.name;
+                option2.textContent = `${doctor.name} (${doctor.code})`;
+                adminSelect.appendChild(option2);
+            });
+        }
+
+        function filterDoctors(searchText) {
+            const userSelect = document.getElementById('doctorSelect');
+            userSelect.innerHTML = '<option value="">Выберите врача</option>';
+            
+            const filtered = doctors.filter(doctor => 
+                doctor.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                doctor.code.includes(searchText)
+            );
+            
+            filtered.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.name;
+                option.textContent = `${doctor.name} (${doctor.code})`;
+                userSelect.appendChild(option);
+            });
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            errorDiv.classList.add('hidden');
+
+            if (username === 'admin' && password === '0909') {
+                currentUser = 'admin';
+                showAdminScreen();
+            } else if (password === '1111' && ['siema', 'barakat', 'aini', 'citymall'].includes(username)) {
+                currentUser = username;
+                currentStore = username;
+                showUserScreen();
+            } else {
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentStore = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('userScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showUserScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('userScreen').classList.remove('hidden');
+            const storeNames = {
+                siema: 'Сиема',
+                barakat: 'Баракат',
+                aini: 'Айни',
+                citymall: 'Сити Молл'
+            };
+            document.getElementById('userBadge').textContent = storeNames[currentStore];
+            loadTodaySales();
+        }
+
+        function showAdminScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.remove('hidden');
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('filterDateFrom').value = today;
+            document.getElementById('filterDateTo').value = today;
+            applyFilters();
+        }
+
+        function addProductRow() {
+            const productList = document.getElementById('productList');
+            const newRow = document.createElement('div');
+            newRow.className = 'product-item';
+            newRow.innerHTML = `
+                <select class="product-select">
+                    <option value="">Выберите товар</option>
+                    <option value="Обувь">Обувь</option>
+                    <option value="Стельки">Стельки</option>
+                    <option value="Шина Фрейка">Шина Фрейка</option>
+                    <option value="Брейс Вальгус">Брейс Вальгус</option>
+                    <option value="Подпятник">Подпятник</option>
+                    <option value="Бандаж">Бандаж</option>
+                    <option value="Супинатор">Супинатор</option>
+                    <option value="Массажер">Массажер</option>
+                    <option value="Коврик">Коврик</option>
+                </select>
+                <input type="number" class="product-quantity" placeholder="Количество" min="1" value="1">
+                <input type="number" class="product-price" placeholder="Цена" min="0" step="0.01">
+                <button onclick="removeProductRow(this)">×</button>
+            `;
+            productList.appendChild(newRow);
+        }
+
+        function removeProductRow(button) {
+            const productList = document.getElementById('productList');
+            if (productList.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        async function submitSale() {
+            const doctorName = document.getElementById('doctorSelect').value;
+            const messageDiv = document.getElementById('saleMessage');
+
+            if (!doctorName) {
+                messageDiv.textContent = 'Пожалуйста, выберите врача';
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const productItems = document.querySelectorAll('.product-item');
+            const sales = [];
+
+            for (let item of productItems) {
+                const product = item.querySelector('.product-select').value;
+                const quantity = parseInt(item.querySelector('.product-quantity').value);
+                const price = parseFloat(item.querySelector('.product-price').value);
+
+                if (product && quantity > 0 && price >= 0) {
+                    sales.push({
+                        store: currentStore,
+                        doctor_name: doctorName,
+                        product: product,
+                        quantity: quantity,
+                        price: price,
+                        total: quantity * price,
+                        sale_date: new Date().toISOString()
+                    });
+                }
+            }
+
+            if (sales.length === 0) {
+                messageDiv.textContent = 'Пожалуйста, добавьте хотя бы один товар с ценой';
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/doctor_sales`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(sales)
+                });
+
+                if (response.ok) {
+                    messageDiv.textContent = `Продажа успешно сохранена! Добавлено позиций: ${sales.length}`;
+                    messageDiv.className = 'success-message';
+                    messageDiv.classList.remove('hidden');
+                    
+                    document.getElementById('doctorSelect').value = '';
+                    document.getElementById('productList').innerHTML = `
+                        <div class="product-item">
+                            <select class="product-select">
+                                <option value="">Выберите товар</option>
+                                <option value="Обувь">Обувь</option>
+                                <option value="Стельки">Стельки</option>
+                                <option value="Шина Фрейка">Шина Фрейка</option>
+                                <option value="Брейс Вальгус">Брейс Вальгус</option>
+                                <option value="Подпятник">Подпятник</option>
+                                <option value="Бандаж">Бандаж</option>
+                                <option value="Супинатор">Супинатор</option>
+                                <option value="Массажер">Массажер</option>
+                                <option value="Коврик">Коврик</option>
+                            </select>
+                            <input type="number" class="product-quantity" placeholder="Количество" min="1" value="1">
+                            <input type="number" class="product-price" placeholder="Цена" min="0" step="0.01">
+                        </div>
+                    `;
+
+                    setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+                    loadTodaySales();
+                } else {
+                    throw new Error('Ошибка при сохранении');
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Ошибка при сохранении продажи';
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+            }
+        }
+
+        async function loadTodaySales() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/doctor_sales?store=eq.${currentStore}&sale_date=gte.${today}T00:00:00&sale_date=lte.${today}T23:59:59&order=sale_date.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    }
+                );
+
+                const sales = await response.json();
+                const tbody = document.getElementById('todaySalesTable');
+                
+                if (sales.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-text-muted);">Продаж пока нет</td></tr>';
+                    document.getElementById('todaySalesCount').textContent = '0';
+                    document.getElementById('todaySalesTotal').textContent = '0';
+                } else {
+                    tbody.innerHTML = sales.map(sale => {
+                        const time = new Date(sale.sale_date).toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
+                        return `
+                            <tr>
+                                <td>${time}</td>
+                                <td>${sale.doctor_name}</td>
+                                <td>${sale.product}</td>
+                                <td>${sale.quantity}</td>
+                                <td>${sale.price.toFixed(2)}</td>
+                                <td>${sale.total.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    const totalSum = sales.reduce((sum, sale) => sum + sale.total, 0);
+                    document.getElementById('todaySalesCount').textContent = sales.length;
+                    document.getElementById('todaySalesTotal').textContent = totalSum.toFixed(2);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки продаж:', error);
+            }
+        }
+
+        async function applyFilters() {
+            const store = document.getElementById('filterStore').value;
+            const doctor = document.getElementById('filterDoctor').value;
+            const product = document.getElementById('filterProduct').value;
+            const dateFrom = document.getElementById('filterDateFrom').value;
+            const dateTo = document.getElementById('filterDateTo').value;
+
+            let url = `${SUPABASE_URL}/rest/v1/doctor_sales?order=sale_date.desc`;
+
+            if (store) url += `&store=eq.${store}`;
+            if (doctor) url += `&doctor_name=eq.${encodeURIComponent(doctor)}`;
+            if (product) url += `&product=eq.${encodeURIComponent(product)}`;
+            if (dateFrom) url += `&sale_date=gte.${dateFrom}T00:00:00`;
+            if (dateTo) url += `&sale_date=lte.${dateTo}T23:59:59`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                const sales = await response.json();
+                const tbody = document.getElementById('adminSalesTable');
+
+                const storeNames = {
+                    siema: 'Сиема',
+                    barakat: 'Баракат',
+                    aini: 'Айни',
+                    citymall: 'Сити Молл'
+                };
+
+                if (sales.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--color-text-muted);">Нет данных по выбранным фильтрам</td></tr>';
+                    document.getElementById('adminSalesCount').textContent = '0';
+                    document.getElementById('adminSalesTotal').textContent = '0';
+                } else {
+                    tbody.innerHTML = sales.map(sale => {
+                        const date = new Date(sale.sale_date).toLocaleDateString('ru-RU');
+                        const time = new Date(sale.sale_date).toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
+                        return `
+                            <tr>
+                                <td>${date}</td>
+                                <td>${time}</td>
+                                <td>${storeNames[sale.store] || sale.store}</td>
+                                <td>${sale.doctor_name}</td>
+                                <td>${sale.product}</td>
+                                <td>${sale.quantity}</td>
+                                <td>${sale.price.toFixed(2)}</td>
+                                <td>${sale.total.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    const totalSum = sales.reduce((sum, sale) => sum + sale.total, 0);
+                    document.getElementById('adminSalesCount').textContent = sales.length;
+                    document.getElementById('adminSalesTotal').textContent = totalSum.toFixed(2);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        }
+
+        initDoctorSelects();
+
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+
+        document.getElementById('doctorSearch').addEventListener('input', (e) => {
+            const searchText = e.target.value;
+            if (searchText.length === 0) {
+                renderDoctorLists();
+            } else {
+                filterDoctors(searchText);
+            }
+        });
+
+        async function addNewDoctor() {
+            const name = document.getElementById('newDoctorName').value.trim();
+            const code = document.getElementById('newDoctorCode').value.trim();
+            const messageDiv = document.getElementById('addDoctorMessage');
+
+            if (!name || !code) {
+                messageDiv.textContent = 'Заполните все поля';
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const exists = doctors.find(d => d.code === code || d.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                messageDiv.textContent = 'Врач с таким именем или кодом уже существует';
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+                return;
+            }
+
+            doctors.push({name: name, code: code});
+            doctors.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+            
+            renderDoctorLists();
+
+            document.getElementById('newDoctorName').value = '';
+            document.getElementById('newDoctorCode').value = '';
+
+            messageDiv.textContent = `Врач ${name} (${code}) успешно добавлен!`;
+            messageDiv.className = 'success-message';
+            messageDiv.classList.remove('hidden');
+            setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
